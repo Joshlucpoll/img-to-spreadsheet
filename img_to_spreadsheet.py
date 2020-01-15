@@ -30,11 +30,13 @@ def getImage():
     #opens up file explorer in the users "Pictures" directory and asks them to select a photo
     root = Tk().withdraw()
     filename =  filedialog.askopenfilename(initialdir = "~\Pictures",title = "Select file",filetypes = (("Image File","*.jpg *.png"),("all files","*.*")))
-
-    #opens the image using PIL and reduces the resolution to better fit the spreadsheet
-    img = Image.open(filename, "r")
-    img.thumbnail((400, 400))
-    width, height = img.size
+    try:
+        #opens the image using PIL and reduces the resolution to better fit the spreadsheet
+        img = Image.open(filename, "r")
+        img.thumbnail((200, 200))
+        width, height = img.size
+    except:
+        exit()
 
     #extracts the subpixel values into a 2D array
     pixelValues = list(img.getdata())
