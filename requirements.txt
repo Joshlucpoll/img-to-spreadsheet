@@ -1,4 +1,0 @@
-﻿et-xmlfile==1.0.1
-jdcal==1.4.1
-openpyxl==3.0.0
-Pillow==6.2.2
