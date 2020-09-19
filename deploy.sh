@@ -6,7 +6,7 @@ npm run build
 # navigate into the build output directory
 cd dist
 # if you are deploying to a custom domain
-echo 'img-to-spreadsheet.joshlucpoll.com' > CNAME
+echo 'img-to-spreadsheet.joshlucpoll.dev' > CNAME
 git init
 git add -A
 git commit -m 'deploy'

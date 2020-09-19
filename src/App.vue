@@ -3,10 +3,9 @@
     <div> 
       <input type="file" accept="image/*" @change="onFileChange($event)"/> 
       <button @click="onFileUpload()"> 
-        Upload! 
+        Convert! 
       </button>
     </div>
-    <a id="download">download</a>
   </div>
 </template>
 
@@ -17,6 +16,7 @@ import Excel from "exceljs";
 export default {
   name: 'App',
   methods: {
+
     toColumnName(num) {
       for (var ret = '', a = 1, b = 26; (num -= a) >= 0; a = b, b *= 26) {
         ret = String.fromCharCode(parseInt((num % b) / a) + 65) + ret;
@@ -24,22 +24,33 @@ export default {
       return ret;
     },
 
+
     onFileChange(event) {
       this.file = event.target.files[0];
+      this.fileName = this.file.name.split('.').slice(0, -1).join('.')
     },
+
 
     async downloadFile(workbook) {
       const buffer = await workbook.xlsx.writeBuffer()
-      console.log(buffer);
-      let blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      let url = window.URL.createObjectURL(blob);
 
-      document.getElementById("download").href = url;
-      console.log(buffer);
+      const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url = window.URL.createObjectURL(blob);
+
+      const download = document.createElement('a');
+      download.setAttribute("href", url);
+      download.setAttribute("download", `${this.fileName}-to-spreadsheet.xlsx`);
+
+      download.style.display = 'none';
+      document.body.appendChild(download);
+
+      download.click();
+
+      document.body.removeChild(download);
     },
 
-    onFileUpload() {
 
+    onFileUpload() {
       var reader = new FileReader();
       reader.onload = (e) => {
 
@@ -57,8 +68,6 @@ export default {
 
             pixelData.push([red, green, blue]);
           });
-
-          console.log(pixelData);
 
           const workbook = new Excel.Workbook();
           const sheet = workbook.addWorksheet('Image');
@@ -104,13 +113,7 @@ export default {
               count++;
             }
           }
-
-
-          console.log(workbook)
-
-
           this.downloadFile(workbook);
-
         })
         .catch(err => {
           throw Error(err);
@@ -118,7 +121,7 @@ export default {
       };
 
       reader.readAsArrayBuffer(this.file);
-    }
+    },
   }
 }
 </script>
@@ -130,6 +133,39 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  padding-top: 60px;
 }
+
+
+
+/* Copyright (c) 2020 by Manuel Pinto (https://codepen.io/P1N2O/pen/pyBNzX)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
 </style>
