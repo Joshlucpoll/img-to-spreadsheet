@@ -83,12 +83,13 @@ export default {
       else {
         var reader = new FileReader();
         reader.onload = (e) => {
+          this.converting = true;
   
           Jimp.read(e.target.result)
           .then(async (image) => {
-  
-            this.converting = true;
-            image.scaleToFit(200, 200);
+
+
+            image.scaleToFit(400, 600);
             const pixelData = [];
   
             image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
@@ -101,47 +102,31 @@ export default {
             });
   
             const workbook = new Excel.Workbook();
-            const sheet = workbook.addWorksheet('Image');
+            const sheet = workbook.addWorksheet('Image', {properties: {defaultColWidth: 3}});
   
             let count = 0;
             
             for (let y = 0; y < image.bitmap.height; y++) {
               for (let x = 0; x < image.bitmap.width; x++) {
-                for (let subPixel = 0; subPixel < 3; subPixel++) {
-  
-                  const cellNum = this.toColumnName(x + 1) + (((y + 1) * 3) - 2 + subPixel).toString();
-                  const cell = sheet.getCell(cellNum);
-  
-                  const data = pixelData[count][subPixel];
-                  const hexString = data.toString(16);
-                  let colour;
-                  
-                  if (subPixel === 0) {
-                    colour = `00${hexString}0000`
-                  }
-                  if (subPixel === 1) {
-                    colour = `0000${hexString}00`
-                  }
-                  if (subPixel === 2) {
-                    colour = `000000${hexString}`
-                  }
-  
-                  cell.value = data;
-  
-                  cell.fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor:{argb: colour}
-                  };
-  
-                  cell.border = {
-                    top: {style:'thin', color: {argb: colour}},
-                    left: {style:'thin', color: {argb: colour}},
-                    bottom: {style:'thin', color: {argb: colour}},
-                    right: {style:'thin', color: {argb: colour}}
-                  };
-  
+                const cellNum = this.toColumnName(x + 1) + (y + 1).toString();
+                const cell = sheet.getCell(cellNum);
+
+                const componentToHex = (c) => {
+                  var hex = c.toString(16);
+                  return hex.length == 1 ? "0" + hex : hex;
                 }
+
+                let colour = '00' +
+                  componentToHex(pixelData[count][0]) +
+                  componentToHex(pixelData[count][1]) +
+                  componentToHex(pixelData[count][2]);
+
+                cell.fill = {
+                  type: "pattern",
+                  pattern: "solid",
+                  fgColor:{argb: colour}
+                };
+
                 count++;
               }
               await this.sleep(1);
