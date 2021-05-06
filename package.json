@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "sh deploy.sh"
+    "deploy": "vue-cli-service build && echo 'img-to-spreadsheet.joshlucpoll.dev' > dist/CNAME && gh-pages -d dist"
   },
   "dependencies": {
     "core-js": "^3.6.5",
